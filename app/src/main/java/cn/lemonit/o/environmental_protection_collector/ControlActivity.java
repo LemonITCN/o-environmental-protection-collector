@@ -202,8 +202,8 @@ public class ControlActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        setPressureValue(pressureValue + (1 + (int) Math.floor(Math.random() * 2)) * (smartType == 0 ? 1 : -1));
-                        setTemperatureValue(temperatureValue + (1 + (int) Math.floor(Math.random() * 4)) * (smartType == 0 ? 1 : -1));
+                        setPressureValue(pressureValue + (1 + (int) Math.floor(Math.random() * 4)) * (smartType == 0 ? 1 : -1));
+                        setTemperatureValue(temperatureValue + (1 + (int) Math.floor(Math.random() * 2)) * (smartType == 0 ? 1 : -1));
                     }
                 });
             }
@@ -211,8 +211,12 @@ public class ControlActivity extends AppCompatActivity {
     }
 
     private void setManualFanState(Boolean newState) {
+        this.manualFanState = newState;
         this.manualFanValueTextView.setText(newState ? "ON" : "OFF");
         if (newState) {
+            if (this.manualFanTimer != null) {
+                this.manualFanTimer.cancel();
+            }
             initManualFanTimer();
             this.manualFanTimer.schedule(this.manualFanTimerTask, 0, 500);
         } else {
@@ -235,6 +239,9 @@ public class ControlActivity extends AppCompatActivity {
                         if (pressureValue.equals(MIN_PRESSURE_VALUE) && temperatureValue.equals(MIN_TEMPERATURE_VALUE)) {
                             // 都降到最低值了，停止风扇
                             Toast.makeText(ControlActivity.this, "压力与温度已达最低值，自动关闭风扇", Toast.LENGTH_SHORT).show();
+                            if (manualFanTimer != null) {
+                                manualFanTimer.cancel();
+                            }
                             setManualFanState(false);
                         }
                     }
